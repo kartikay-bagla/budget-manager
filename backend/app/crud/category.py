@@ -38,12 +38,15 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         *,
         user_id: Optional[int] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: Optional[int] = 100
     ) -> list[Category]:
         query = db.query(self.model)
         if user_id:
             query = query.filter(Category.user_id == user_id)
-        return query.offset(skip).limit(limit).all()
+        query = query.offset(skip)
+        if limit:
+            query = query.limit(limit)
+        return query.all()
 
     def get_by_name(
         self,

@@ -46,15 +46,18 @@ class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
         end_date: dt.date,
         user_id: Optional[int] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: Optional[int] = 100
     ) -> list[Expense]:
         query = db.query(self.model)
         if user_id:
             query = query.filter(Expense.user_id == user_id)
-        return query.filter(
+        query = query.filter(
             Expense.date >= start_date,
             Expense.date <= end_date
-        ).offset(skip).limit(limit).all()
+        ).offset(skip)
+        if limit:
+            query = query.limit(limit)
+        return query.all()
 
 
 expense = CRUDExpense(Expense)

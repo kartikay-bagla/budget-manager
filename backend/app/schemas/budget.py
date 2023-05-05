@@ -8,21 +8,20 @@ class BudgetBase(BaseModel):
 
 # Properties to receive via API on creation
 class BudgetCreate(BudgetBase):
-    pass
-
-
-# Properties to receive via API on update
-class BudgetUpdate(BudgetBase):
-    pass
-
-
-# Properties stored in DB
-class BudgetInDB(BudgetBase):
-    id: int
     user_id: int
     category_id: int
     month: int
     year: int
+
+
+# Properties to receive via API on update
+class BudgetUpdate(BudgetBase):
+    id: int
+
+
+# Properties stored in DB
+class BudgetInDB(BudgetUpdate):
+    pass
 
     class Config:
         orm_mode = True

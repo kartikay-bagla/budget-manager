@@ -9,7 +9,17 @@ from app.schemas.budget import BudgetCreate, BudgetUpdate
 
 class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
     def create(self, db: Session, *, obj_in: BudgetCreate) -> Budget:
-        raise NotImplementedError("Budget cannot be created via CRUD.")
+        db_obj = Budget(
+            amount=obj_in.amount,
+            user_id=obj_in.user_id,
+            category_id=obj_in.category_id,
+            month=obj_in.month,
+            year=obj_in.year
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
 
     def update(
         self,
@@ -32,19 +42,20 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
         year: int,
         user_id: Optional[int] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: Optional[int] = 100
     ) -> list[Budget]:
         query = db.query(self.model)
         if user_id:
             query = query.filter(self.model.user_id == user_id)
-        return (
+        query = (
             query
             .filter(self.model.month == month)
             .filter(self.model.year == year)
             .offset(skip)
-            .limit(limit)
-            .all()
         )
+        if limit:
+            query = query.limit(limit)
+        return query.all()
 
     def get_multi_by_range_and_user(
         self,
@@ -56,12 +67,12 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
         end_year: int,
         user_id: Optional[int] = None,
         skip: int = 0,
-        limit: int = 100
+        limit: Optional[int] = 100
     ) -> list[Budget]:
         query = db.query(self.model)
         if user_id:
             query = query.filter(self.model.user_id == user_id)
-        return (
+        query = (
             query
             .filter(
                 (self.model.year > start_year)
@@ -72,9 +83,10 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
                 | ((self.model.year == end_year) & (self.model.month <= end_month))
             )
             .offset(skip)
-            .limit(limit)
-            .all()
         )
+        if limit:
+            query = query.limit(limit)
+        return query.all()
 
 
 budget = CRUDBudget(Budget)
