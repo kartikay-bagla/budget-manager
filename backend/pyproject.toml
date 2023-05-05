@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["kartikay-bagla <kartikaybagla@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = "^0.22.0"
+fastapi = "^0.95.1"
+requests = "^2.29.0"
+celery = "^5.2.7"
+pydantic = "^1.10.7"
+psycopg2-binary = "^2.9.6"
+alembic = "^1.10.4"
+SQLAlchemy = "^2.0.12"
+pytest = "^7.3.1"
+pandas = "^2.0.1"
+python-dateutil = "^2.8.2"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.2.0"
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+pytest = "^7.3.1"
+pytest-cov = "^4.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
