@@ -8,17 +8,19 @@ class ExpenseBase(BaseModel):
     category_id: int
     description: str
     amount: float
-    date: date_obj
+    date: date_obj    
 
+
+class ExpenseRecurring(BaseModel):
+    is_recurring: bool
 
 # Properties to send to crud
-class ExpenseCreateCRUD(ExpenseBase):
-    is_recurring: bool
+class ExpenseCreateCRUD(ExpenseBase, ExpenseRecurring):
     recurring_id: Optional[str]
 
 
 # Properties to receive via API on creation
-class ExpenseCreateAPI(ExpenseCreateCRUD):
+class ExpenseCreateAPI(ExpenseBase, ExpenseRecurring):
     user_id: int
     recurring_start_date: date_obj
     recurring_end_date: date_obj

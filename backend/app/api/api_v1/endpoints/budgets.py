@@ -25,7 +25,7 @@ def read_budgets(
 
     If the user is a superuser, retrieve all budgets for the given month.
     """
-    if 1 <= month <= 12:
+    if not 1 <= month <= 12:
         raise HTTPException(
             status_code=400,
             detail="Month must be between 1 and 12.",

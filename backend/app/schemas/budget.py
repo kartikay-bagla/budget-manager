@@ -20,7 +20,7 @@ class BudgetUpdate(BudgetBase):
 
 
 # Properties stored in DB
-class BudgetInDB(BudgetUpdate):
+class BudgetInDB(BudgetCreate, BudgetUpdate):
     pass
 
     class Config:

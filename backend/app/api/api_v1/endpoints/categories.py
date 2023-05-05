@@ -36,7 +36,13 @@ def create_category(
     """
     Create new category.
     """
-    category = crud.category.get_by_name(db, name=category_in.name)
+    if category_in.user_id != current_user.id and not current_user.is_superuser:
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    category = crud.category.get_by_name(
+        db,
+        name=category_in.name,
+        user_id=category_in.user_id
+    )
     if category:
         raise HTTPException(
             status_code=400,

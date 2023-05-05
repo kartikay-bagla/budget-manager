@@ -49,16 +49,14 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         return query.all()
 
     def get_by_name(
-        self,
-        db: Session,
-        *,
-        name: str,
-        user_id: Optional[int] = None
+        self, db: Session, *, name: str, user_id: int
     ) -> Optional[Category]:
-        query = db.query(self.model).filter(Category.name == name)
-        if user_id:
-            query = query.filter(Category.user_id == user_id)
-        return query.first()
+        return (
+            db.query(self.model)
+            .filter(Category.name == name)
+            .filter(Category.user_id == user_id)
+            .first()
+        )
 
 
 category = CRUDCategory(Category)

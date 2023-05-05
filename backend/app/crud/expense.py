@@ -17,6 +17,7 @@ class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
             amount=obj_in.amount,
             category_id=obj_in.category_id,
             user_id=user_id,
+            date=obj_in.date,
             is_recurring=obj_in.is_recurring,
             recurring_id=obj_in.recurring_id,
         )

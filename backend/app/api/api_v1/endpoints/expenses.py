@@ -48,6 +48,18 @@ def create_expense(
     Need to resolve recurring_freqency here to generate a list of expenses and then
         create them all.
     """
+    # raise error if user isnt SU and user.id !+ expense_in.user_id
+    if expense_in.user_id != current_user.id and not current_user.is_superuser:
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    cat = crud.category.get(db=db, id=expense_in.category_id)
+    # raise error if cat DNE or if user isnt SU and cat.user_id != user.id
+    if not cat or (cat.user_id != current_user.id and not current_user.is_superuser):
+        raise HTTPException(
+            status_code=400,
+            detail="The category with this id does not exist in the system.",
+        )
+
     if not expense_in.is_recurring:
         expense = crud.expense.create_with_user(
             db=db,
@@ -59,7 +71,7 @@ def create_expense(
                 is_recurring=False,
                 recurring_id=None,
             ),
-            user_id=current_user.id
+            user_id=expense_in.user_id
         )
         return [expense]
 
@@ -101,7 +113,7 @@ def create_expense(
             user_id=current_user.id,
         )
         expenses.append(expense)
-        return expenses
+    return expenses
 
 
 @router.put("/{expense_id}", response_model=schemas.Expense)
