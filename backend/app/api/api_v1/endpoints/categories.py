@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.crud.budget import create_budgets_for_categories
 
 router = APIRouter()
 
@@ -42,6 +43,7 @@ def create_category(
             detail="The category with this name already exists in the system.",
         )
     category = crud.category.create(db, obj_in=category_in)
+    create_budgets_for_categories(db=db, categories=[category])
     return category
 
 
