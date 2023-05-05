@@ -1,4 +1,5 @@
 from datetime import date as date_obj
+from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base_class import Base
@@ -14,4 +15,4 @@ class Expense(Base):
     amount: Mapped[float]
     date: Mapped[date_obj]
     is_recurring: Mapped[bool]
-    recurring_id: Mapped[str]
+    recurring_id: Mapped[Optional[str]]

@@ -1,6 +1,8 @@
 import datetime
+import uuid
 from typing import Any, List
 
+import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -23,7 +25,6 @@ def read_expenses(
     Retrieve expenses.
     """
     user_id = None if current_user.is_superuser else current_user.id
-    # TODO: Create get_multi_by_range_and_user.
     return crud.expense.get_multi_by_range_and_user(
         db=db,
         user_id=user_id,
@@ -34,7 +35,7 @@ def read_expenses(
     )
 
 
-@router.post("/", response_model=schemas.Expense)
+@router.post("/", response_model=list[schemas.Expense])
 def create_expense(
     *,
     db: Session = Depends(deps.get_db),
@@ -47,11 +48,60 @@ def create_expense(
     Need to resolve recurring_freqency here to generate a list of expenses and then
         create them all.
     """
-    # TODO: Add recurring expenses logic.
-    expense = crud.expense.create_with_user(
-        db=db, obj_in=expense_in, user_id=current_user.id
-    )
-    return expense
+    if not expense_in.is_recurring:
+        expense = crud.expense.create_with_user(
+            db=db,
+            obj_in=schemas.ExpenseCreateCRUD(
+                category_id=expense_in.category_id,
+                description=expense_in.description,
+                amount=expense_in.amount,
+                date=expense_in.date,
+                is_recurring=False,
+                recurring_id=None,
+            ),
+            user_id=current_user.id
+        )
+        return [expense]
+
+    recurring_id = str(uuid.uuid4())
+    try:
+        assert expense_in.recurring_frequency is not None
+        assert expense_in.recurring_start_date is not None
+        assert expense_in.recurring_end_date is not None
+    except AssertionError as e:
+        raise HTTPException(
+            status_code=400,
+            detail="If is_recurring is True, recurring_frequency, "
+            "recurring_start_date, and recurring_end_date must be provided.",
+        ) from e
+    try:
+        date_range: list[datetime.datetime] = pd.date_range(
+            start=expense_in.recurring_start_date,
+            end=expense_in.recurring_end_date,
+            freq=expense_in.recurring_frequency,
+        ).to_pydatetime()
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid recurring_frequency, recurring_start_date, or "
+            "recurring_end_date."
+        ) from e
+    expenses = []
+    for date in date_range:
+        expense = crud.expense.create_with_user(
+            db=db,
+            obj_in=schemas.ExpenseCreateCRUD(
+                category_id=expense_in.category_id,
+                description=expense_in.description,
+                amount=expense_in.amount,
+                date=date.date(),
+                is_recurring=True,
+                recurring_id=recurring_id,
+            ),
+            user_id=current_user.id,
+        )
+        expenses.append(expense)
+        return expenses
 
 
 @router.put("/{expense_id}", response_model=schemas.Expense)

@@ -1,4 +1,5 @@
-from typing import Any, Dict, Union
+import datetime as dt
+from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
 
@@ -36,6 +37,24 @@ class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         return super().update(db, db_obj=db_obj, obj_in=update_data)
+
+    def get_multi_by_range_and_user(
+        self,
+        db: Session,
+        *,
+        start_date: dt.date,
+        end_date: dt.date,
+        user_id: Optional[int] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> list[Expense]:
+        query = db.query(self.model)
+        if user_id:
+            query = query.filter(Expense.user_id == user_id)
+        return query.filter(
+            Expense.date >= start_date,
+            Expense.date <= end_date
+        ).offset(skip).limit(limit).all()
 
 
 expense = CRUDExpense(Expense)

@@ -1,4 +1,5 @@
 from datetime import date as date_obj
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -13,7 +14,7 @@ class ExpenseBase(BaseModel):
 # Properties to send to crud
 class ExpenseCreateCRUD(ExpenseBase):
     is_recurring: bool
-    recurring_id: str
+    recurring_id: Optional[str]
 
 
 # Properties to receive via API on creation
