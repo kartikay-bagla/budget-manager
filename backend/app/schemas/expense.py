@@ -8,11 +8,12 @@ class ExpenseBase(BaseModel):
     category_id: int
     description: str
     amount: float
-    date: date_obj    
+    date: date_obj
 
 
 class ExpenseRecurring(BaseModel):
     is_recurring: bool
+
 
 # Properties to send to crud
 class ExpenseCreateCRUD(ExpenseBase, ExpenseRecurring):
