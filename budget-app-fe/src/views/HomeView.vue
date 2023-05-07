@@ -1,9 +1,11 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="container">
+      <div class="center-align">
+        <h1>Hello there!</h1>
+        <h3>General Kenobi</h3>
+    </div>
+  </div>
 </template>

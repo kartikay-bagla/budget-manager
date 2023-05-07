@@ -8,8 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "material-icons": "^1.13.6",
+    "materialize-css": "^1.0.0-rc.2",
     "vue": "^3.2.47",
-    "vue-material": "^1.0.0-beta-16",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
