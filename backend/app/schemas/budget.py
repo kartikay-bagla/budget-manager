@@ -8,7 +8,6 @@ class BudgetBase(BaseModel):
 
 # Properties to receive via API on creation
 class BudgetCreate(BudgetBase):
-    user_id: int
     category_id: int
     month: int
     year: int

@@ -14,7 +14,6 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
     def create(self, db: Session, *, obj_in: BudgetCreate) -> Budget:
         db_obj = Budget(
             amount=obj_in.amount,
-            user_id=obj_in.user_id,
             category_id=obj_in.category_id,
             month=obj_in.month,
             year=obj_in.year
@@ -37,21 +36,17 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
             update_data = obj_in.dict(exclude_unset=True)
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def get_multi_by_month_and_user(
+    def get_multi_by_month(
         self,
         db: Session,
         *,
         month: int,
         year: int,
-        user_id: Optional[int] = None,
         skip: int = 0,
         limit: Optional[int] = 100
     ) -> list[Budget]:
-        query = db.query(self.model)
-        if user_id:
-            query = query.filter(self.model.user_id == user_id)
         query = (
-            query
+            db.query(self.model)
             .filter(self.model.month == month)
             .filter(self.model.year == year)
             .offset(skip)
@@ -60,7 +55,7 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
             query = query.limit(limit)
         return query.all()
 
-    def get_multi_by_range_and_user(
+    def get_multi_by_range(
         self,
         db: Session,
         *,
@@ -68,15 +63,11 @@ class CRUDBudget(CRUDBase[Budget, BudgetCreate, BudgetUpdate]):
         start_year: int,
         end_month: int,
         end_year: int,
-        user_id: Optional[int] = None,
         skip: int = 0,
         limit: Optional[int] = 100
     ) -> list[Budget]:
-        query = db.query(self.model)
-        if user_id:
-            query = query.filter(self.model.user_id == user_id)
         query = (
-            query
+            db.query(self.model)
             .filter(
                 (self.model.year > start_year)
                 | ((self.model.year == start_year) & (self.model.month >= start_month))
@@ -108,7 +99,6 @@ def _get_if_budget_exist_else_create(
         db=db,
         obj_in=BudgetCreate(
             amount=cat.default_budget_amount,
-            user_id=cat.user_id,
             category_id=cat.id,
             month=month,
             year=year,

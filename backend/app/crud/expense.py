@@ -9,23 +9,6 @@ from app.schemas.expense import ExpenseCreateCRUD, ExpenseUpdate
 
 
 class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
-    def create_with_user(
-        self, db: Session, *, user_id: int, obj_in: ExpenseCreateCRUD
-    ) -> Expense:
-        db_obj = Expense(
-            description=obj_in.description,
-            amount=obj_in.amount,
-            category_id=obj_in.category_id,
-            user_id=user_id,
-            date=obj_in.date,
-            is_recurring=obj_in.is_recurring,
-            recurring_id=obj_in.recurring_id,
-        )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
-
     def update(
         self,
         db: Session,
@@ -39,20 +22,16 @@ class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
             update_data = obj_in.dict(exclude_unset=True)
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def get_multi_by_range_and_user(
+    def get_multi_by_range(
         self,
         db: Session,
         *,
         start_date: dt.date,
         end_date: dt.date,
-        user_id: Optional[int] = None,
         skip: int = 0,
         limit: Optional[int] = 100
     ) -> list[Expense]:
-        query = db.query(self.model)
-        if user_id:
-            query = query.filter(Expense.user_id == user_id)
-        query = query.filter(
+        query = db.query(self.model).filter(
             Expense.date >= start_date,
             Expense.date <= end_date
         ).offset(skip)

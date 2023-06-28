@@ -5,7 +5,6 @@ from pydantic import BaseModel
 class CategoryBase(BaseModel):
     name: str
     default_budget_amount: float
-    user_id: int
 
 
 # Properties to receive via API on creation

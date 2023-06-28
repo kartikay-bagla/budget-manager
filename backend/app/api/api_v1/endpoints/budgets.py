@@ -18,12 +18,9 @@ def read_budgets(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Retrieve budgets for given month for the user.
-
-    If the user is a superuser, retrieve all budgets for the given month.
+    Retrieve budgets for given month.
     """
     if not 1 <= month <= 12:
         raise HTTPException(
@@ -31,10 +28,8 @@ def read_budgets(
             detail="Month must be between 1 and 12.",
         )
 
-    user_id = None if current_user.is_superuser else current_user.id
-
-    return crud.budget.get_multi_by_month_and_user(
-        db, month=month, year=year, user_id=user_id, skip=skip, limit=limit
+    return crud.budget.get_multi_by_month(
+        db, month=month, year=year, skip=skip, limit=limit
     )
 
 
@@ -42,17 +37,14 @@ def read_budgets(
 def read_budget(
     budget_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve budget by ID.
     """
-    budget = crud.budget.get(db, id=budget_id)
-    if not budget:
+    if budget := crud.budget.get(db, id=budget_id):
+        return budget
+    else:
         raise HTTPException(status_code=404, detail="Budget not found")
-    if budget.user_id != current_user.id and not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    return budget
 
 
 @router.put("/{budget_id}", response_model=schemas.Budget)
@@ -60,7 +52,6 @@ def update_budget(
     budget_id: int,
     budget_in: schemas.BudgetUpdate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a budget.
@@ -68,8 +59,6 @@ def update_budget(
     budget = crud.budget.get(db, id=budget_id)
     if not budget:
         raise HTTPException(status_code=404, detail="Budget not found")
-    if budget.user_id != current_user.id and not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     budget = crud.budget.update(db, db_obj=budget, obj_in=budget_in)
     return budget
 

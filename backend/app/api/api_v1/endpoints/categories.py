@@ -3,7 +3,7 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, schemas
 from app.api import deps
 from app.crud.budget import create_budgets_for_categories
 
@@ -15,14 +15,12 @@ def read_categories(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve categories.
     """
-    user_id = None if current_user.is_superuser else current_user.id
-    return crud.category.get_multi_by_user(
-        db=db, user_id=user_id, skip=skip, limit=limit
+    return crud.category.get_multi(
+        db=db, skip=skip, limit=limit
     )
 
 
@@ -31,17 +29,13 @@ def create_category(
     *,
     db: Session = Depends(deps.get_db),
     category_in: schemas.CategoryCreate,
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new category.
     """
-    if category_in.user_id != current_user.id and not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     category = crud.category.get_by_name(
         db,
         name=category_in.name,
-        user_id=category_in.user_id
     )
     if category:
         raise HTTPException(
@@ -59,14 +53,11 @@ def update_category(
     db: Session = Depends(deps.get_db),
     category_id: int,
     category_in: schemas.CategoryUpdate,
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an category.
     """
     category = crud.category.get(db, id=category_id)
-    if not category or category.user_id != current_user.id:
-        raise HTTPException(status_code=404, detail="Category not found")
     if category.name != category_in.name and crud.category.get_by_name(
         db, name=category_in.name
     ):
@@ -82,12 +73,8 @@ def update_category(
 def read_category(
     category_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve category by ID.
     """
-    category = crud.category.get(db, id=category_id)
-    if not category or category.user_id != current_user.id:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return category
+    return crud.category.get(db, id=category_id)
