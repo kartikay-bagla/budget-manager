@@ -1,6 +1,10 @@
 export function get_today_date() {
     // return date as yyyy-mm-dd
-    return new Date().toISOString().split('T')[0];
+    let a = new Date(); 
+    let y = a.getFullYear();
+    let m = (a.getMonth() + 1).toString().padStart(2, "0");
+    let d = a.getDate().toString().padStart(2, "0");
+    return `${y}-${m}-${d}`;
 }
 
 export function get_current_month_start_date() {

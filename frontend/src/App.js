@@ -9,18 +9,20 @@ import Navbar from './components/Navbar';
 
 const App = () => {
   return (
-    <div className='container'>
-        <Router>
+    <>
+      <Router>
+        <Navbar />
+        <div className='container'>
           <Routes>
-            <Navbar />
             <Route path="/" element={<Home />} />
             <Route path="/category" element={<Category />} />
             <Route path="/budgets" element={<Budget />} />
             <Route path="/expenses" element={<Expenses />} />
           </Routes>
-        </Router>
-      </div>
-    );
+        </div>
+      </Router>
+    </>
+  );
 };
 
 export default App;

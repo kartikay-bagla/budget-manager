@@ -2,8 +2,12 @@
 import React from 'react';
 
 const ExpensesTable = ({expenses}) => {
+  // check if length of expenses is 0 and return a simple message in that case
+  if (expenses.length === 0) {
+    return <p className='center-align'>No expenses for this date.</p>;
+  }
   return (
-    <table className="highlight striped responsive-table">
+    <table className="highlight striped">
       <thead>
         <tr>
           <th>Description</th>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ExpensesTable from '../components/ExpensesTable';
 import { get_expenses } from '../utils/api';
 import { get_today_date } from '../utils/dates';
+import CreateExpensePopup from '../components/CreateExpensePopup';
 
 const Home = () => {
   const [expenses, setExpenses] = useState([]);
@@ -20,6 +21,8 @@ const Home = () => {
       <div className="card">
         <div className="card-content">
           <ExpensesTable expenses={expenses} />
+          <br />
+          <CreateExpensePopup />
         </div>
       </div>
     </div>
