@@ -2,6 +2,8 @@ from datetime import date as date_obj
 from typing import Optional
 from pydantic import BaseModel
 
+from app.schemas.category import Category
+
 
 # Shared properties
 class ExpenseBase(BaseModel):
@@ -35,6 +37,7 @@ class ExpenseUpdate(ExpenseBase):
 # Properties stored in DB
 class ExpenseInDB(ExpenseCreateCRUD):
     id: int
+    category: Category
 
     class Config:
         orm_mode = True
@@ -43,3 +46,7 @@ class ExpenseInDB(ExpenseCreateCRUD):
 # Properties to return via API
 class Expense(ExpenseInDB):
     pass
+
+
+class TotalExpense(BaseModel):
+    total: float

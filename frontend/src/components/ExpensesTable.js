@@ -12,7 +12,8 @@ const ExpensesTable = ({expenses}) => {
         <tr>
           <th>Description</th>
           <th>Amount</th>
-          <th>Category ID</th>
+          <th>Date</th>
+          <th>Category</th>
         </tr>
       </thead>
       <tbody>
@@ -20,7 +21,8 @@ const ExpensesTable = ({expenses}) => {
           <tr key={expense.id}>
             <td>{expense.description}</td>
             <td>{expense.amount}</td>
-            <td>{expense.category_id}</td>
+            <td>{expense.date}</td>
+            <td>{expense.category.name}</td>
           </tr>
         ))}
       </tbody>

@@ -1,5 +1,7 @@
 from typing import Any, List, Optional
+import datetime as dt
 
+from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_utils.tasks import repeat_every
 from sqlalchemy.orm import Session
@@ -11,7 +13,24 @@ from app.crud.budget import create_budgets_for_categories
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Budget])
+def get_full_budget_data(db: Session, budget: models.Budget):
+    sd = dt.date(year=budget.year, month=budget.month, day=1)
+    ed = sd + relativedelta(months=1)
+    total_expenses = crud.expense.get_total_by_cat_for_range(
+        db=db, start_date=sd, end_date=ed, category_id=budget.category_id
+    )
+    return schemas.BudgetWithAmount(
+        amount=budget.amount,
+        id=budget.id,
+        category_id=budget.category_id,
+        month=budget.month,
+        year=budget.year,
+        category=budget.category,
+        expenses=total_expenses,
+    )
+
+
+@router.get("/", response_model=List[schemas.BudgetWithAmount])
 def read_budgets(
     month: int,
     year: int,
@@ -28,12 +47,15 @@ def read_budgets(
             detail="Month must be between 1 and 12.",
         )
 
-    return crud.budget.get_multi_by_month(
+    create_budgets_for_categories(db=db, categories=None)
+
+    budgets = crud.budget.get_multi_by_month(
         db, month=month, year=year, skip=skip, limit=limit
     )
+    return [get_full_budget_data(db=db, budget=budget) for budget in budgets]
 
 
-@router.get("/{budget_id}", response_model=schemas.Budget)
+@router.get("/{budget_id}", response_model=schemas.BudgetWithAmount)
 def read_budget(
     budget_id: int,
     db: Session = Depends(deps.get_db),
@@ -42,7 +64,7 @@ def read_budget(
     Retrieve budget by ID.
     """
     if budget := crud.budget.get(db, id=budget_id):
-        return budget
+        return get_full_budget_data(db=db, budget=budget)
     else:
         raise HTTPException(status_code=404, detail="Budget not found")
 

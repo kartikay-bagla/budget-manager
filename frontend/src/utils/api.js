@@ -2,8 +2,20 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:8000/api/v1";
 
+export async function get_recent_expenses(skip, limit) {
+    return axios.get(`${BASE_URL}/expenses/?skip=${skip}&limit=${limit}`)
+}
+
 export async function get_expenses(start_date, end_date) {
     return axios.get(`${BASE_URL}/expenses/?start_date=${start_date}&end_date=${end_date}`)
+}
+
+export async function get_total_expenses(start_date, end_date) {
+    return axios.get(`${BASE_URL}/expenses/total/?start_date=${start_date}&end_date=${end_date}`)
+}
+
+export async function get_budgets(month, year) {
+    return axios.get(`${BASE_URL}/budgets/?month=${month}&year=${year}`)
 }
 
 export async function get_categories() {

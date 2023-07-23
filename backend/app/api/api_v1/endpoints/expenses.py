@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Any, List
+from typing import Any, List, Optional
 
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,10 +12,28 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Expense])
-def read_expenses(
+@router.get("/total", response_model=schemas.TotalExpense)
+def total_expenses(
     start_date: datetime.date,
     end_date: datetime.date,
+    db: Session = Depends(deps.get_db),
+) -> schemas.TotalExpense:
+    expenses = crud.expense.get_multi_by_range(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    return schemas.TotalExpense(
+        total=sum(i.amount for i in expenses)
+    )
+
+
+@router.get("/", response_model=List[schemas.Expense])
+def read_expenses(
+    start_date: Optional[datetime.date] = None,
+    end_date: Optional[datetime.date] = None,
+    order_by: str = "date",
+    order_ascending: bool = False,
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
@@ -27,6 +45,8 @@ def read_expenses(
         db=db,
         start_date=start_date,
         end_date=end_date,
+        order_by=order_by,
+        order_ascending=order_ascending,
         skip=skip,
         limit=limit,
     )

@@ -11,8 +11,8 @@ Useful commands:
 ## FE Pages:
 * Home
   * ~~Expense Table with quick add expense~~
-  * Current month budget statuses
-  * Total expenses for this month
+  * ~~Current month budget statuses~~
+  * ~~Total expenses for this month~~
   * Total budgets for this month
 * Category
   * Create category

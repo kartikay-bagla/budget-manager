@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from app.schemas.category import Category
+
 
 # Shared properties
 class BudgetBase(BaseModel):
@@ -20,6 +22,7 @@ class BudgetUpdate(BudgetBase):
 
 # Properties stored in DB
 class BudgetInDB(BudgetCreate, BudgetUpdate):
+    category: Category
     pass
 
     class Config:
@@ -29,3 +32,7 @@ class BudgetInDB(BudgetCreate, BudgetUpdate):
 # Properties to return via API
 class Budget(BudgetInDB):
     pass
+
+
+class BudgetWithAmount(Budget):
+    expenses: float

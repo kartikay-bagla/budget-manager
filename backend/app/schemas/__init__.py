@@ -1,4 +1,4 @@
-from .budget import Budget, BudgetCreate, BudgetInDB, BudgetUpdate
+from .budget import Budget, BudgetCreate, BudgetInDB, BudgetUpdate, BudgetWithAmount
 from .category import Category, CategoryCreate, CategoryInDB, CategoryUpdate
 from .expense import (
     Expense,
@@ -6,6 +6,7 @@ from .expense import (
     ExpenseCreateAPI,
     ExpenseInDB,
     ExpenseUpdate,
+    TotalExpense,
 )
 from .msg import Msg
 
@@ -14,6 +15,7 @@ __all__ = [
     "BudgetCreate",
     "BudgetInDB",
     "BudgetUpdate",
+    "BudgetWithAmount",
     "Category",
     "CategoryCreate",
     "CategoryInDB",
@@ -23,5 +25,6 @@ __all__ = [
     "ExpenseCreateAPI",
     "ExpenseInDB",
     "ExpenseUpdate",
+    "TotalExpense",
     "Msg",
 ]
