@@ -24,9 +24,7 @@ class ExpenseCreateCRUD(ExpenseBase, ExpenseRecurring):
 
 # Properties to receive via API on creation
 class ExpenseCreateAPI(ExpenseBase, ExpenseRecurring):
-    recurring_start_date: Optional[date_obj]
-    recurring_end_date: Optional[date_obj]
-    recurring_frequency: Optional[str]
+    recurring_dates: Optional[list[date_obj]]
 
 
 # Properties to receive via API on update

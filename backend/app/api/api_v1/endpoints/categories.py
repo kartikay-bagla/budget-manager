@@ -58,6 +58,11 @@ def update_category(
     Update an category.
     """
     category = crud.category.get(db, id=category_id)
+    if not category:
+        raise HTTPException(
+            status_code=404,
+            detail="The category with this ID does not exist in the system.",
+        )
     if category.name != category_in.name and crud.category.get_by_name(
         db, name=category_in.name
     ):

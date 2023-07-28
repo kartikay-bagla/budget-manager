@@ -2,7 +2,6 @@ import datetime
 import uuid
 from typing import Any, List, Optional
 
-import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -88,36 +87,23 @@ def create_expense(
 
     recurring_id = str(uuid.uuid4())
     try:
-        assert expense_in.recurring_frequency is not None
-        assert expense_in.recurring_start_date is not None
-        assert expense_in.recurring_end_date is not None
+        recurring_dates = expense_in.recurring_dates
+        assert recurring_dates is not None
+        assert len(recurring_dates) > 1
     except AssertionError as e:
         raise HTTPException(
             status_code=400,
-            detail="If is_recurring is True, recurring_frequency, "
-            "recurring_start_date, and recurring_end_date must be provided.",
-        ) from e
-    try:
-        date_range: list[datetime.datetime] = pd.date_range(
-            start=expense_in.recurring_start_date,
-            end=expense_in.recurring_end_date,
-            freq=expense_in.recurring_frequency,
-        ).to_pydatetime()
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid recurring_frequency, recurring_start_date, or "
-            "recurring_end_date."
+            detail="If is_recurring is True, recurring_dates must be provided.",
         ) from e
     expenses = []
-    for date in date_range:
+    for i, date in enumerate(recurring_dates):
         expense = crud.expense.create(
             db=db,
             obj_in=schemas.ExpenseCreateCRUD(
                 category_id=expense_in.category_id,
-                description=expense_in.description,
+                description=f"{expense_in.description} ({i+1}/{len(recurring_dates)})",
                 amount=expense_in.amount,
-                date=date.date(),
+                date=date,
                 is_recurring=True,
                 recurring_id=recurring_id,
             ),
