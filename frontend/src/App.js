@@ -12,7 +12,7 @@ const App = () => {
     <>
       <Router>
         <Navbar />
-        <div className='container'>
+        <div className='px-8 py-2'>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/category" element={<Category />} />

@@ -11,15 +11,10 @@ const BudgetProgressBar = ({ budget }) => {
         progress_color = "determinate red";
     }
     return (
-        <div className='card'>
-            <div className='card-content'>
-                <span className="card-title">{budget.category.name}</span>
-                {budget.expenses}/{budget.amount}
-            </div>
-            <div className='card-action'>
-                <div className="progress">
-                    <div className={progress_color} style={{width: perc+"%"}}></div>
-                </div>
+        <div className='flex justify-center flex-col items-center'>
+            {budget.category.name} - {budget.expenses}/{budget.amount}
+            <div className="progress">
+                <div className={progress_color} style={{width: perc+"%"}}></div>
             </div>
         </div>
     );
