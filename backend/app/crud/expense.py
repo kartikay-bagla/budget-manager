@@ -38,11 +38,9 @@ class CRUDExpense(CRUDBase[Expense, ExpenseCreateCRUD, ExpenseUpdate]):
         if start_date:
             query = query.filter(Expense.date >= start_date)
         if end_date:
-            query = query.filter(Expense.date <= end_date)
-        if order_ascending:
-            query = query.order_by(order_by)
-        else:
-            query = query.order_by(desc(order_by))
+            query = query.filter(Expense.date < end_date)
+        order_by_obj = order_by if order_ascending else desc(order_by)
+        query = query.order_by(order_by_obj, desc("amount"))  # type: ignore
         query = query.offset(skip)
         if limit:
             query = query.limit(limit)
