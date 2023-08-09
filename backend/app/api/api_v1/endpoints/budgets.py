@@ -15,10 +15,15 @@ router = APIRouter()
 
 def get_full_budget_data(db: Session, budget: models.Budget):
     sd = dt.date(year=budget.year, month=budget.month, day=1)
+    td = dt.date.today() + relativedelta(days=1)
     ed = sd + relativedelta(months=1)
-    total_expenses = crud.expense.get_total_by_cat_for_range(
-        db=db, start_date=sd, end_date=ed, category_id=budget.category_id
+    past_expenses = crud.expense.get_total_by_cat_for_range(
+        db=db, start_date=sd, end_date=td, category_id=budget.category_id
     )
+    future_expenses = crud.expense.get_total_by_cat_for_range(
+        db=db, start_date=td, end_date=ed, category_id=budget.category_id
+    )
+    total_expenses = past_expenses + future_expenses
     return schemas.BudgetWithAmount(
         amount=budget.amount,
         id=budget.id,
@@ -26,7 +31,9 @@ def get_full_budget_data(db: Session, budget: models.Budget):
         month=budget.month,
         year=budget.year,
         category=budget.category,
-        expenses=total_expenses,
+        past_expenses=past_expenses,
+        future_expenses=future_expenses,
+        expenses=total_expenses
     )
 
 

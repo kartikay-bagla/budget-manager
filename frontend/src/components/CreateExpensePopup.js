@@ -1,34 +1,50 @@
-import React, { useEffect } from 'react';
-import M from 'materialize-css';
+import React from 'react';
 import ExpenseForm from './CreateExpenseModal';
+import { Box, Modal } from '@mui/material';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
 
 const CreateExpensePopup = () => {
-    useEffect(() => {
-      // Initialize the popup when the component mounts
-      const options = {
-        // You can customize the popup options here
-      };
-      const popup = document.querySelectorAll('.modal');
-      M.Modal.init(popup, options);
-    }, []);
-  
-    return (
-      <div>
-        <div className='right-align'>
-        <button className="waves-effect waves-light btn-flat teal lighten-1 white-text modal-trigger" data-target="popupModal">
-            Add Expense
-        </button>
-        </div>
-  
-        {/* The popup content */}
-        <div id="popupModal" className="modal">
-          <div className="modal-content">
-            <ExpenseForm />
-          </div>
-        </div>
-      </div>
-    );
-  };
-  
-  export default CreateExpensePopup;
-  
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  return (
+    <Box>
+      <Fab
+        color="primary" aria-label="add" onClick={handleOpen}
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        <AddIcon />
+      </Fab>
+
+      {/* The popup content */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-create-expense-form"
+        aria-describedby="modal-form-to-create-expense-entry"
+      >
+        <Box sx={style}>
+          <ExpenseForm />
+        </Box>
+      </Modal>
+    </Box>
+  );
+};
+
+export default CreateExpensePopup;

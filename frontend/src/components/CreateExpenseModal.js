@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import M from 'materialize-css';
 import { add_non_recurring_expense, add_recurring_expense, get_categories } from '../utils/api';
+import { Box, Button, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+
 
 const ExpenseForm = () => {
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [expenseDate, setExpenseDate] = useState('');
+  const [expenseDate, setExpenseDate] = useState(dayjs());
   const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringStartDate, setRecurringStartDate] = useState('');
-  const [recurringEndDate, setRecurringEndDate] = useState('');
-  const [recurringFrequency, setRecurringFrequency] = useState('');
+  const [recurringStartDate, setRecurringStartDate] = useState(dayjs());
+  const [recurringEndDate, setRecurringEndDate] = useState(dayjs());
+  const [recurringFrequency, setRecurringFrequency] = useState('1M');
 
   useEffect(() => {
     // Call the function to get the list of categories and set the state
     get_categories()
-        .then(response => {
-            setCategories(response.data);
-            console.log(response.data)
-            M.FormSelect.init(document.querySelectorAll('select'), {});
-        })
-        .catch(error => console.error(error));
+      .then(response => {
+        setCategories(response.data);
+        console.log(response.data)
+      })
+      .catch(error => console.error(error));
 
   }, []);
 
@@ -30,14 +32,15 @@ const ExpenseForm = () => {
 
     // Do something with the form data, e.g., submit it to a backend API
     if (isRecurring) {
-        add_recurring_expense(
-            category, description, amount, expenseDate,
-            recurringStartDate, recurringEndDate, recurringFrequency
-        )
+      add_recurring_expense(
+        category, description, amount, expenseDate.format("YYYY-MM-DD"),
+        recurringStartDate.format("YYYY-MM-DD"), recurringEndDate.format("YYYY-MM-DD"),
+        recurringFrequency
+      )
     } else {
-        add_non_recurring_expense(
-            category, description, amount, expenseDate
-        )
+      add_non_recurring_expense(
+        category, description, amount, expenseDate.format("YYYY-MM-DD")
+      )
     }
     // Reset the form after submission (optional)
     resetForm();
@@ -47,106 +50,75 @@ const ExpenseForm = () => {
     setCategory('');
     setDescription('');
     setAmount('');
-    setExpenseDate('');
+    setExpenseDate(dayjs());
     setIsRecurring(false);
-    setRecurringStartDate('');
-    setRecurringEndDate('');
+    setRecurringStartDate(dayjs());
+    setRecurringEndDate(dayjs());
     setRecurringFrequency('');
   };
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <div className='input-field col s12'>
-        <label htmlFor="category">Category:</label>
-        <select id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }} component="form" onSubmit={handleFormSubmit}>
+      <FormControl fullWidth>
+        <InputLabel id="category">Category:</InputLabel>
+        <Select
+          labelId="category" value={category} label="Category"
+          onChange={(e) => setCategory(e.target.value)}
+        >
           <option value="" disabled>Select a category</option>
           {categories.map((category) => (
-            <option key={category.id} value={category.id}>
+            <MenuItem key={category.id} value={category.id}>
               {category.name}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
+        </Select>
+      </FormControl>
 
-      <div>
-        <label htmlFor="description">Description:</label>
-        <input
-          type="text"
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+      <TextField
+        id="description" label="Description" variant="outlined"
+        value={description} onChange={(e) => setDescription(e.target.value)}
+      />
+
+      <TextField
+        id="amount" label="Amount" variant="outlined" type='number'
+        value={amount} onChange={(e) => setAmount(e.target.value)}
+      />
+
+      <DatePicker
+        label="Expense Date" value={expenseDate}
+        onChange={(e) => setExpenseDate(e)}
+      />
+
+      <FormControlLabel control={
+        <Switch
+          checked={isRecurring}
+          onChange={(e) => setIsRecurring(e.target.checked)}
+          inputProps={{ 'aria-label': 'controlled' }}
         />
-      </div>
-
-      <div>
-        <label htmlFor="amount">Amount:</label>
-        <input
-          type="number"
-          id="amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="expenseDate">Expense Date:</label>
-        <input
-          type="date"
-          id="expenseDate"
-          value={expenseDate}
-          onChange={(e) => setExpenseDate(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label>
-          Is recurring expense:
-          <input
-            type="checkbox" className='filled-in'
-            checked={isRecurring}
-            onChange={(e) => setIsRecurring(e.target.checked)}
-          />
-        </label>
-      </div>
+      } label="Recurring expense?" />
 
       {isRecurring && (
-        <div>
-          <label htmlFor="recurringStartDate">Recurring Start Date:</label>
-          <input
-            type="date"
-            id="recurringStartDate"
+        <>
+          <DatePicker
+            label="Recurring Start Date"
             value={recurringStartDate}
-            onChange={(e) => setRecurringStartDate(e.target.value)}
+            onChange={(e) => setRecurringStartDate(e)}
           />
-        </div>
-      )}
-
-      {isRecurring && (
-        <div>
-          <label htmlFor="recurringEndDate">Recurring End Date:</label>
-          <input
-            type="date"
-            id="recurringEndDate"
+          <DatePicker
+            label="Recurring End Date"
             value={recurringEndDate}
-            onChange={(e) => setRecurringEndDate(e.target.value)}
+            onChange={(e) => setRecurringEndDate(e)}
           />
-        </div>
-      )}
-
-      {isRecurring && (
-        <div>
-          <label htmlFor="recurringFrequency">Recurring Frequency:</label>
-          <input
-            type="text"
-            id="recurringFrequency"
-            value={recurringFrequency}
+          <TextField
+            id="recurringFrequency" label="Recurring Frequency" variant="outlined"
+            value={amount}
             onChange={(e) => setRecurringFrequency(e.target.value)}
           />
-        </div>
+        </>
       )}
-
-      <button type="submit">Submit</button>
-    </form>
+      <Button variant='contained' type='submit'>Submit</Button>
+    </Box>
+    
   );
 };
 

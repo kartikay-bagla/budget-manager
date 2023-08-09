@@ -36,3 +36,5 @@ class Budget(BudgetInDB):
 
 class BudgetWithAmount(Budget):
     expenses: float
+    past_expenses: float
+    future_expenses: float
