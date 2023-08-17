@@ -10,6 +10,7 @@ Useful commands:
 
 ## FE Pages:
 * ~~Home/Dashboard~~
+  * Show top N savings goals (by priority) along with status here
 * Expenses
   * Add expenses
     * ~~Non recurring expenses~~
@@ -23,6 +24,6 @@ Useful commands:
   * Create budget
   * Edit budget
   * Delete/archive budget
-
-## TODO:
-* Add savings as a feature, saving goals to keep track of and adding money to savings.
+* Savings:
+  * Show Current Goals and Progress
+  * Add entry to update goals
