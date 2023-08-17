@@ -9,6 +9,20 @@ from .expense import (
     TotalExpense,
 )
 from .msg import Msg
+from .savings_goal import (
+    SavingsGoal,
+    SavingsGoalCreate,
+    SavingsGoalInDB,
+    SavingsGoalUpdate,
+    SavingsGoalWithAmount,
+)
+from .savings_entry import (
+    SavingsEntry,
+    SavingsEntryCreateCRUD,
+    SavingsEntryCreateAPI,
+    SavingsEntryInDB,
+    SavingsEntryUpdate,
+)
 
 __all__ = [
     "Budget",
@@ -27,4 +41,14 @@ __all__ = [
     "ExpenseUpdate",
     "TotalExpense",
     "Msg",
+    "SavingsGoal",
+    "SavingsGoalCreate",
+    "SavingsGoalInDB",
+    "SavingsGoalUpdate",
+    "SavingsGoalWithAmount",
+    "SavingsEntry",
+    "SavingsEntryCreateCRUD",
+    "SavingsEntryCreateAPI",
+    "SavingsEntryInDB",
+    "SavingsEntryUpdate",
 ]
